@@ -29,14 +29,28 @@ def get_env_variable(env_variable: str) -> str:
 
 def fetch_quotes_from_notion(notion: Client, page_id: str) -> tp.List[str]:
     """Fetch quotes from a Notion page and return them as a list of strings."""
-    try:
-        page_content: dict = notion.blocks.children.list(block_id=page_id)
-    except APIResponseError as e:
-        raise RuntimeError(f"Failed to fetch Notion page content: {e}")
+    """Fetch quotes from a Notion page and return them as a list of strings."""
+    quotes = []
+    start_cursor = None
 
-    return [block['bulleted_list_item']['rich_text'][0]['text']['content']
-            for block in page_content.get("results", [])
-            if block['type'] == 'bulleted_list_item']
+    while True:
+        try:
+            response: dict = notion.blocks.children.list(block_id=page_id, start_cursor=start_cursor)
+        except APIResponseError as e:
+            raise RuntimeError(f"Failed to fetch Notion page content: {e}")
+
+        blocks = response.get("results", [])
+        quotes.extend([block['bulleted_list_item']['rich_text'][0]['text']['content']
+                      for block in blocks
+                      if block['type'] == 'bulleted_list_item'])
+
+        # Check if there are more pages to fetch
+        if response.get("has_more"):
+            start_cursor = response.get("next_cursor")
+        else:
+            break
+
+    return quotes
 
 
 def print_colorful(text: str, quote_color: Colors, author_color: Colors):
@@ -54,7 +68,7 @@ def main():
     quotes = fetch_quotes_from_notion(notion, page_id)
     if quotes:
         quote = random.choice(quotes)
-        print_colorful(quote, Colors.CYAN, Colors.GREEN)
+        print_colorful(quote, Colors.GREEN, Colors.RED)
     else:
         print("No quotes found.")
 
