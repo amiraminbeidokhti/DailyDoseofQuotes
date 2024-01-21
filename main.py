@@ -65,12 +65,15 @@ def main():
     notion = Client(auth=get_env_variable("NOTION_TOKEN"))
     page_id = get_env_variable("PAGE_ID")
 
-    quotes = fetch_quotes_from_notion(notion, page_id)
-    if quotes:
-        quote = random.choice(quotes)
-        print_colorful(quote, Colors.GREEN, Colors.RED)
-    else:
-        print("No quotes found.")
+    try:
+        quotes = fetch_quotes_from_notion(notion, page_id)
+        if quotes:
+            quote = random.choice(quotes)
+            print_colorful(quote, Colors.GREEN, Colors.RED)
+        else:
+            print("No quotes found.")
+    except:
+        print("No quotes for today due to a problem!")
 
 
 if __name__ == "__main__":
