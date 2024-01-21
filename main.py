@@ -43,7 +43,7 @@ def print_colorful(text: str, quote_color: Colors, author_color: Colors):
     quote_parts = text.split('\n')
     quote, author = '\n'.join(quote_parts[:-1]), quote_parts[-1]
 
-    print(f"\n{quote_color.value}{quote}\n\n\t{author_color.value}{author}{Colors.RESET.value}")
+    print(f"\n{Colors.YELLOW.value}**********DAILY QUOTES**********\n{quote_color.value}{quote}\n\n\t{author_color.value}{author}\n{Colors.YELLOW.value}********************************{Colors.RESET.value}\n")
 
 
 def main():
@@ -54,7 +54,7 @@ def main():
     quotes = fetch_quotes_from_notion(notion, page_id)
     if quotes:
         quote = random.choice(quotes)
-        print_colorful(quote, Colors.GREEN, Colors.CYAN)
+        print_colorful(quote, Colors.CYAN, Colors.GREEN)
     else:
         print("No quotes found.")
 
